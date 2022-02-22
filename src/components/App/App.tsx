@@ -1,12 +1,11 @@
 import React from 'react';
-import Hello from './components/Hello';
+import { WhoIsStaying } from '../WhoIsStaying';
 import './App.css';
 
 function App() {
   return (
     <div className="App">
-      <Hello />
-      Your code here :)
+      <WhoIsStaying initialRooms={"1:4,6|3"}/>
     </div>
   );
 }

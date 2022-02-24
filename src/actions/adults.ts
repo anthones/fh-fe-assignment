@@ -15,9 +15,7 @@ export const addAdult = (roomId: number): addAdultAction => ({
   payload: roomId,
 });
 
-export const removeAdult = (roomId: number): removeAdultAction => {
-  return {
-    type: ActionTypes.removeAdult,
-    payload: roomId,
-  }
-};
+export const removeAdult = (roomId: number): removeAdultAction => ({
+  type: ActionTypes.removeAdult,
+  payload: roomId,
+});

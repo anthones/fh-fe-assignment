@@ -12,7 +12,7 @@ export interface removeChildAction {
 
 export interface removeAllChildrenAction {
   type: ActionTypes.removeAllChildren;
-  payload: number ;
+  payload: number;
 }
 
 export interface updateChildrenAgeAction {
@@ -25,9 +25,12 @@ export const addChild = (roomId: number): addChildAction => ({
   payload: roomId,
 });
 
-export const removeChild = (roomId: number, childId?: string): removeChildAction => ({
+export const removeChild = (
+  roomId: number,
+  childId?: string
+): removeChildAction => ({
   type: ActionTypes.removeChild,
-  payload: {roomId, childId},
+  payload: { roomId, childId },
 });
 
 export const removeAllChildren = (roomId: number): removeAllChildrenAction => ({

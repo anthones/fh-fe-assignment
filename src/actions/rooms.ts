@@ -2,7 +2,7 @@ import axios from "axios";
 import { Dispatch } from "redux";
 import { ActionTypes } from "./types";
 
-const url = 'example.com'
+const url = "https://example.com";
 
 export interface Room {
   roomId: number;
@@ -48,16 +48,16 @@ export const addRoom = (): addRoomAction => ({
 
 export const updateRooms = (newRooms: Partial<Room>[]): updateRoomsAction => ({
   type: ActionTypes.updateRooms,
-  payload: newRooms
-})
+  payload: newRooms,
+});
 
 export const searchRooms = (output: string) => {
   return async (dispatch: Dispatch) => {
-    const response = await axios.post<string>(url, output)
+    const response = await axios.post<string>(url, output);
 
     dispatch<searchRoomsAction>({
       type: ActionTypes.searchRooms,
-      payload: response.data
-    })
-  }
-}
+      payload: response.data,
+    });
+  };
+};

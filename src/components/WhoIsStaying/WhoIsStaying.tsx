@@ -13,16 +13,17 @@ import {
   updateChildrenAge,
   removeAllChildren,
 } from "../../actions";
-import { StoreState } from "../../reducers";
 import {
-  MAX_ADULTS_PER_ROOM,
-  MAX_CHILDREN_PER_ROOM,
   MAX_ROOM_NUMBER,
+  MAX_CHILDREN_AGE,
   MAX_ROOM_OCCUPANCY,
+  MAX_ADULTS_PER_ROOM,
   MIN_ADULTS_PER_ROOM,
+  MAX_CHILDREN_PER_ROOM,
 } from "../../util/constants";
+import { StoreState } from "../../reducers";
 import { initialState2Rooms, rooms2Output } from "../../util/converters";
-// import "./WhoIsStaying.scss";
+import "./WhoIsStaying.css";
 
 interface WhoIsStayingStateProps {
   rooms?: Room[];
@@ -39,7 +40,7 @@ interface WhoIsStayingDispatchProps {
   removeRoom: typeof removeRoom;
   removeAdult: typeof removeAdult;
   updateRooms: typeof updateRooms;
-  removeChild: typeof removeChild
+  removeChild: typeof removeChild;
   searchRooms: (output: string) => void;
   removeAllChildren: typeof removeAllChildren;
   updateChildrenAge: typeof updateChildrenAge;
@@ -84,27 +85,38 @@ class _WhoIsStaying extends React.PureComponent<
   }
 
   private renderAdults = (roomId: number, adults: number, children: number) => (
-    <div>
-      <span>Adults</span>
-      <button
-        disabled={adults === MIN_ADULTS_PER_ROOM || this.state.minAdultsError}
-        onClick={() => {
-          this.state.maxAdultsError && this.setState({ maxAdultsError: false });
-          this.state.maxRoomOccupancyError && this.setState({maxRoomOccupancyError: false})
-          this.removeAdult(roomId, adults);
-        }}
-      >
-        -
-      </button>
-      <span>{adults}</span>
-      <button
-        disabled={(adults === MAX_ADULTS_PER_ROOM || adults + children === MAX_ROOM_OCCUPANCY) || this.state.maxAdultsError || this.state.maxRoomOccupancyError}
-        onClick={() => {
-          this.addAdult(roomId, adults, children);
-        }}
-      >
-        +
-      </button>
+    <div className="adults">
+      <span className="adults-title">Adults</span>
+      <div className="adults-counter">
+        <button
+          className="operation-button"
+          disabled={adults === MIN_ADULTS_PER_ROOM || this.state.minAdultsError}
+          onClick={() => {
+            this.state.maxAdultsError &&
+              this.setState({ maxAdultsError: false });
+            this.state.maxRoomOccupancyError &&
+              this.setState({ maxRoomOccupancyError: false });
+            this.removeAdult(roomId, adults);
+          }}
+        >
+          -
+        </button>
+        <span className="adults-input">{adults}</span>
+        <button
+          className="operation-button"
+          disabled={
+            adults === MAX_ADULTS_PER_ROOM ||
+            adults + children === MAX_ROOM_OCCUPANCY ||
+            this.state.maxAdultsError ||
+            this.state.maxRoomOccupancyError
+          }
+          onClick={() => {
+            this.addAdult(roomId, adults, children);
+          }}
+        >
+          +
+        </button>
+      </div>
     </div>
   );
 
@@ -114,73 +126,87 @@ class _WhoIsStaying extends React.PureComponent<
     children: number,
     childrenAges: Room["childrenAges"]
   ) => (
-    <div>
-      <span>Children</span>
-      <button
-        onClick={() => {
-          this.props.removeAllChildren(roomId);
-        }}
-      >
-        -
-      </button>
-      <span>{children || 0}</span>
-      <button
-        disabled={(adults === MAX_ADULTS_PER_ROOM || adults + children === MAX_ROOM_OCCUPANCY) ||
-          this.state.maxChildrenError || this.state.maxRoomOccupancyError
-        }
-        onClick={() => {
-          this.addChild(roomId, adults, children);
-        }}
-      >
-        +
-      </button>
-      {this.childrenMapper(roomId, children, childrenAges)}
+    <div className="children">
+      <span className="children-title">Children</span>
+      <div className="children-counter">
+        <button
+          className="operation-button"
+          onClick={() => {
+            this.props.removeAllChildren(roomId);
+          }}
+        >
+          -
+        </button>
+        <span className="children-input ">{children || 0}</span>
+        <button
+          className="operation-button"
+          disabled={
+            adults === MAX_ADULTS_PER_ROOM ||
+            adults + children === MAX_ROOM_OCCUPANCY ||
+            this.state.maxChildrenError ||
+            this.state.maxRoomOccupancyError
+          }
+          onClick={() => {
+            this.addChild(roomId, adults, children);
+          }}
+        >
+          +
+        </button>
+      </div>
     </div>
   );
 
   private childrenMapper = (
     roomId: number,
-    children: number,
     childrenAges: Room["childrenAges"]
-  ) => {
-    return (
-      children > 0 &&
-      Object.entries(childrenAges).map(child => {
-        const [childId, childAge] = child;
-        return (
-          <div key={childId}>
-            <span>{`Child ${childId} age`}</span>
-            <select
-              name="Age"
-              onChange={event =>
-                this.props.updateChildrenAge(
-                  roomId,
-                  childId,
-                  parseInt(event.target.value, 10)
-                )
-              }
-              value={childAge}
-            >
-              {Array(8)
-                .fill(0)
-                .map((_, i) => (
-                  <option key={i} value={`${++i}`}>
-                    {i++}
-                  </option>
-                ))}
-            </select>
-            <button
-              onClick={() => {
-                this.props.removeChild(roomId, childId);
-              }}
-            >
-              X
-            </button>
-          </div>
-        );
-      })
-    );
-  };
+  ) => (
+    <div className="individual-children">
+      <div className="individual-children-inner">
+        {Object.entries(childrenAges).map(child => {
+          const [childId, childAge] = child;
+          return (
+            <div key={childId} className="individual-child">
+              <label className="individual-child-wrapper">
+                <div className="child-title">{`Child ${childId} age`}</div>
+                <div className="child-select">
+                  <div className="select-wrapper">
+                    <select
+                      className="select-child-age"
+                      name="Age"
+                      onChange={event =>
+                        this.props.updateChildrenAge(
+                          roomId,
+                          childId,
+                          parseInt(event.target.value, 10)
+                        )
+                      }
+                      value={childAge}
+                    >
+                      {Array(MAX_CHILDREN_AGE)
+                        .fill(0)
+                        .map((_, i) => (
+                          <option key={i} value={`${++i}`}>
+                            {i++}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  <button
+                    className="remove-child-button"
+                    onClick={() => {
+                      this.props.removeChild(roomId, childId);
+                    }}
+                  >
+                    X
+                  </button>
+                </div>
+              </label>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   private addRoom = () => {
     if (this.props.rooms.length >= MAX_ROOM_NUMBER) {
@@ -194,7 +220,7 @@ class _WhoIsStaying extends React.PureComponent<
   private addAdult = (roomId: number, adults: number, children: number) => {
     const { maxAdultsError, maxRoomOccupancyError } = this.state;
 
-    this.setState({minAdultsError: false});
+    this.setState({ minAdultsError: false });
 
     if (adults === MAX_ADULTS_PER_ROOM) {
       this.setState({ maxAdultsError: true });
@@ -206,7 +232,10 @@ class _WhoIsStaying extends React.PureComponent<
     if (adults + children === MAX_ROOM_OCCUPANCY) {
       this.setState({ maxRoomOccupancyError: true });
       return;
-    } else if (maxRoomOccupancyError && adults + children <= MAX_ROOM_OCCUPANCY) {
+    } else if (
+      maxRoomOccupancyError &&
+      adults + children <= MAX_ROOM_OCCUPANCY
+    ) {
       this.setState({ maxRoomOccupancyError: false });
     }
 
@@ -214,7 +243,7 @@ class _WhoIsStaying extends React.PureComponent<
   };
 
   private removeAdult = (roomId: number, adults: number) => {
-    const {minAdultsError} = this.state;
+    const { minAdultsError } = this.state;
 
     if (adults === MIN_ADULTS_PER_ROOM) {
       this.setState({ minAdultsError: true });
@@ -247,25 +276,35 @@ class _WhoIsStaying extends React.PureComponent<
   private roomMapper = () =>
     this.props.rooms.map(
       ({ roomId, adults, children, childrenAges }, index, arr) => (
-        <div key={roomId}>
-          <h4>{`Room ${roomId}`}</h4>
-          <button
-            onClick={() => {
-              this.props.removeRoom(roomId);
-            }}
-          >
-            X
-          </button>
+        <div className="room" key={roomId}>
+          <div className="room-header">
+            <h4 className="room-title">{`Room ${roomId}`}</h4>
+            {roomId > 1 && (
+              <span
+                className="remove-room-button"
+                onClick={() => {
+                  this.props.removeRoom(roomId);
+                }}
+              >
+                Remove Room
+              </span>
+            )}
+          </div>
           {this.renderAdults(roomId, adults, children)}
           {this.renderChildren(roomId, adults, children, childrenAges)}
+          {children > 0 && this.childrenMapper(roomId, childrenAges)}
           {++index === arr.length && (
             <button
-              disabled={this.props.rooms.length === MAX_ROOM_NUMBER || this.state.maxRoomError}
+              className="add-room-button"
+              disabled={
+                this.props.rooms.length === MAX_ROOM_NUMBER ||
+                this.state.maxRoomError
+              }
               onClick={() => {
                 this.addRoom();
               }}
             >
-              Add Room
+              + Add Room
             </button>
           )}
         </div>
@@ -273,34 +312,67 @@ class _WhoIsStaying extends React.PureComponent<
     );
 
   render(): JSX.Element {
+    const { rooms, initialRooms, updateRooms, searchRooms, addRoom } =
+      this.props;
+    console.log(rooms);
+
     return (
-      <>
-        <h1>Who Is Staying</h1>
-        <button
-          onClick={() => {
-            this.props.updateRooms(initialState2Rooms(this.props.initialRooms));
-          }}
-        >
-          X
-        </button>
-        {this.roomMapper()}
-        {!this.props.rooms.length && (
-          <button
-            disabled={this.props.rooms.length === MAX_ROOM_NUMBER || this.state.maxRoomError}
-            onClick={this.props.addRoom}
-          >
-            Add Room
-          </button>
-        )}
-        <button
-          disabled={Object.values(this.state).some(error => !!error)}
-          onClick={() => {
-            this.props.searchRooms(rooms2Output(this.props.rooms));
-          }}
-        >
-          Search
-        </button>
-      </>
+      <div
+        className="modal"
+        style={{
+          ...(window.innerWidth < 620 && { height: window.innerHeight }),
+        }}
+      >
+        <div className="modal-content">
+          <div className="modal-header">
+            <span className="title">Who Is Staying</span>
+            <span
+              className="reset"
+              onClick={() => {
+                updateRooms(initialState2Rooms(initialRooms));
+              }}
+            >
+              X
+            </span>
+          </div>
+          <div className="modal-main">
+            <div className="modal-main-inner">
+              {this.roomMapper()}
+              {!rooms.length && (
+                <div className="add-room-wrap">
+                  <button
+                    className="add-room-button"
+                    disabled={
+                      rooms.length === MAX_ROOM_NUMBER ||
+                      this.state.maxRoomError
+                    }
+                    onClick={addRoom}
+                  >
+                    + Add Room
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="modal-cta">
+            <button
+              className="cta-button"
+              disabled={Object.values(this.state).some(error => !!error)}
+              onClick={() => {
+                searchRooms(rooms2Output(rooms));
+              }}
+            >
+              {`${String.fromCodePoint(0x1f50d)} Search ${
+                rooms.length
+              } rooms ${String.fromCodePoint(0x2022)} ${rooms.reduce(
+                (prev, { adults, children = 0 }) =>
+                  adults + children + (prev || 0),
+                0
+              )} guests`}
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 }

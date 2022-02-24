@@ -314,7 +314,6 @@ class _WhoIsStaying extends React.PureComponent<
   render(): JSX.Element {
     const { rooms, initialRooms, updateRooms, searchRooms, addRoom } =
       this.props;
-    console.log(rooms);
 
     return (
       <div

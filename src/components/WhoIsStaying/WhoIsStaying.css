@@ -26,6 +26,10 @@
     max-height: 100%;
     top: 0%;
   }
+
+  .modal > .modal-content > .modal-header {
+    flex-direction: row-reverse;
+  }
 }
 
 .modal > .modal-content {
